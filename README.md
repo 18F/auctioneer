@@ -55,6 +55,14 @@ email_csv
 # generates a CSV of email addresses in `emails.csv` in the root of the project
 ```
 
+#### Monitor live auctions
+
+Polls the API every 10 seconds, prints out a table of bids for live auctions.
+
+```
+monitor_live_auctions
+```
+
 ## Public domain
 
 This project is in the worldwide [public domain](LICENSE.md). As stated in [CONTRIBUTING](CONTRIBUTING.md):
