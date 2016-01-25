@@ -117,7 +117,8 @@ def monitor_live_auctions
         bids << Auctioneer::Bid.new(bid, auction)
       end
     end
-    STDOUT.puts "Bids so far:"
+    system "clear" or system "cls"
+    STDOUT.puts "Bids (as of #{Time.now}):"
     tp bids, :bidder_name, :amount, {auction_title: {width: 50}}, {auction_url: {width: 50}}, :bidder_github_id, :bidder_duns_number
     sleep 10
   end
