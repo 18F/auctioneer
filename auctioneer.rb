@@ -78,6 +78,9 @@ module Auctioneer
   end
 end
 
+class Winner < Struct.new(:name, :email, :duns_number, :amount, :auction_url, :auction_title)
+end
+
 def email_csv
   client = Auctioneer::Client.new
   users = client.admin_users['admin_report']['non_admin_users']
@@ -101,11 +104,51 @@ def filter_live_auctions(auctions)
   end
 end
 
+def filter_recently_closed_auctions(auctions)
+  auctions.select do |auction|
+    one_day_ago = Time.parse (DateTime.now - 1.0).iso8601
+    end_time = Time.parse(auction['end_datetime'])
+
+    end_time > one_day_ago
+  end
+end
+
+def fetch_recently_closed_auctions
+  client = Auctioneer::Client.new
+  auctions = client.admin_auctions['auctions']
+
+  filter_recently_closed_auctions(auctions)
+end
+
 def fetch_live_auctions
   client = Auctioneer::Client.new
   auctions = client.admin_auctions['auctions']
 
   filter_live_auctions(auctions)
+end
+
+def fetch_recent_winners
+  auctions = fetch_recently_closed_auctions
+  winners = []
+  auctions.each do |auction|
+    winners << auction['bids'].sort_by {|bid| bid['amount']}.map do |bid|
+      winner = Winner.new
+      winner.name = bid['bidder']['name']
+      winner.email = bid['bidder']['email']
+      winner.duns_number = bid['bidder']['duns_number']
+      winner.amount = bid['amount']
+      winner.auction_url = "https://micropurchase.18f.gov/auctions/#{auction['id']}"
+      winner.auction_title = auction['title']
+
+      winner
+    end.first
+  end
+
+  winners
+end
+
+def report_recent_winners
+  tp fetch_recent_winners, :name, :email, :duns_number, :amount, {auction_url: {width: 50}}, {auction_title: {width: 50}}
 end
 
 def monitor_live_auctions
@@ -123,5 +166,7 @@ def monitor_live_auctions
     sleep 10
   end
 end
+
+auctions = fetch_recently_closed_auctions
 
 binding.pry
