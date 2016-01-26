@@ -3,6 +3,7 @@ require 'pry'
 require 'curb'
 require 'json'
 require 'table_print'
+require 'samwise'
 
 module Auctioneer
   class Bid
@@ -79,6 +80,32 @@ module Auctioneer
 end
 
 class Winner < Struct.new(:name, :email, :duns_number, :amount, :auction_url, :auction_title)
+  def sam_info
+    if @sam_info.nil?
+      client = Samwise::Client.new
+      duns_info = client.get_duns_info(duns: duns_number)
+      @sam_info = duns_info['sam_data']['registration']['govtBusinessPoc']
+      @sam_info
+    else
+      @sam_info
+    end
+  end
+
+  def sam_email
+    sam_info['email']
+  end
+
+  def sam_address
+    sam_info['address'].to_s
+  end
+
+  def sam_phone
+    sam_info['usPhone']
+  end
+
+  def sam_poc
+    "#{sam_info['firstName']} #{sam_info['lastName']}"
+  end
 end
 
 def email_csv
@@ -148,7 +175,7 @@ def fetch_recent_winners
 end
 
 def report_recent_winners
-  tp fetch_recent_winners, :name, :email, :duns_number, :amount, {auction_url: {width: 50}}, {auction_title: {width: 50}}
+  tp fetch_recent_winners, :name, :email, :sam_email, :sam_phone, :sam_poc, :duns_number, :amount, {auction_url: {width: 50}}, {auction_title: {width: 50}}
 end
 
 def monitor_live_auctions
