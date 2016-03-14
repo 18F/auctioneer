@@ -2,11 +2,21 @@ PATH
   remote: .
   specs:
     auctioneer (0.1.0)
+      curb
+      pry
+      table_print
 
 GEM
   remote: https://rubygems.org/
   specs:
+    coderay (1.1.1)
+    curb (0.9.1)
     diff-lcs (1.2.5)
+    method_source (0.8.2)
+    pry (0.10.3)
+      coderay (~> 1.1.0)
+      method_source (~> 0.8.1)
+      slop (~> 3.4)
     rake (10.4.2)
     rspec (3.4.0)
       rspec-core (~> 3.4.0)
@@ -21,6 +31,8 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.4.0)
     rspec-support (3.4.1)
+    slop (3.6.0)
+    table_print (1.5.4)
 
 PLATFORMS
   ruby
