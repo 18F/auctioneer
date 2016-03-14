@@ -99,11 +99,28 @@ def filter_live_auctions(auctions)
   end
 end
 
+def filter_auctions_that_ended_n_days_ago(auctions, n)
+  auctions.select do |auction|
+    now = DateTime.now
+    two_days_ago = (now - n).to_time
+    end_time = Time.parse(auction['end_datetime'])
+
+    two_days_ago < end_time
+  end
+end
+
 def fetch_live_auctions
   client = Auctioneer::Client.new
   auctions = client.admin_auctions['auctions']
 
   filter_live_auctions(auctions)
+end
+
+def fetch_recently_ended_auctions(days: 2)
+  client = Auctioneer::Client.new
+  auctions = client.admin_auctions['auctions']
+
+  filter_auctions_that_ended_n_days_ago(auctions, days)
 end
 
 def monitor_live_auctions
@@ -120,6 +137,10 @@ def monitor_live_auctions
     tp bids, :bidder_name, :amount, {auction_title: {width: 50}}, {auction_url: {width: 50}}, :bidder_github_id, :bidder_duns_number
     sleep 10
   end
+end
+
+def email_template(auction)
+  "This is a template for: '#{auction['title']}''"
 end
 
 binding.pry
