@@ -42,7 +42,6 @@ module Auctioneer
 
   class Client
     def initialize(api_key: ENV['MICROPURCHASE_API_KEY'])
-      #@client  = HTTPClient.new
       @headers = {'Accept' => 'text/x-json'}
       @headers['Api-Key'] = api_key if api_key
     end
@@ -56,7 +55,6 @@ module Auctioneer
     end
 
     def get(url)
-      #response = @client.get(path, nil, @headers)
       http = Curl.get(url) do |http|
         http.headers = @headers
       end
