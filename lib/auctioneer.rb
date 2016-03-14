@@ -155,7 +155,7 @@ module Auctioneer
   end
 
   def self.format_time_to_est(time)
-    (Time.parse(time).utc + Time.zone_offset("EST")).strftime("%A, %B %e, %Y at %I:%M %p")
+    (Time.parse(time).utc + Time.zone_offset("EDT")).strftime("%A, %B %e, %Y at %I:%M %p")
   end
 
   def self.winning_bid_for_auction(auction)

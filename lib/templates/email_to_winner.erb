@@ -1,6 +1,10 @@
+<% if !winning_bid['bidder']['email'].empty? %>
+email: <%= winning_bid['bidder']['email'] %>
+<% end %>
+
 Hello,
 
-You've won the micro-purchase '<%= auction['title'] %>' (https://micropurchase.18f.gov/auctions/<%= auction['id'] %>) for $<%= winning_bid['amount'] %>. As stated in the auction rules, you have five business days from the end of the auction to deliver the requirements. This means the delivery deadline is <%= delivery_deadline %>.
+You've won the micro-purchase '<%= auction['title'] %>' (https://micropurchase.18f.gov/auctions/<%= auction['id'] %>) for $<%= winning_bid['amount'] %>. As stated in the auction rules, you have five business days from the end of the auction to deliver the requirements. This means the delivery deadline is <%= delivery_deadline %> EDT.
 
 Please let me know if you have any questions.
 
