@@ -6,6 +6,17 @@ require 'json'
 require 'table_print'
 
 module Auctioneer
+  class Cli
+    def self.route_command(command)
+      if command['email'] == true
+        client = Auctioneer::Client.new
+        id = command["<auction_id>"]
+        auction = client.admin_auction_for_id(id)
+        STDOUT.puts Auctioneer.email_template(auction)
+      end
+    end
+  end
+
   class Bid
     def initialize(bid_hash, auction_hash)
       @bid_hash = bid_hash
@@ -53,6 +64,10 @@ module Auctioneer
 
     def admin_auctions
       get(Auctioneer::Protocol.admin_auctions_path)
+    end
+
+    def admin_auction_for_id(id)
+      admin_auctions['auctions'].find {|a| a['id'].to_i == id.to_i}
     end
 
     def get(url)
@@ -139,7 +154,25 @@ module Auctioneer
     end
   end
 
+  def self.format_time_to_est(time)
+    (Time.parse(time).utc + Time.zone_offset("EST")).strftime("%A, %B %e, %Y at %I:%M %p")
+  end
+
+  def self.winning_bid_for_auction(auction)
+    auction['bids'].sort_by {|bid| bid['amount']}.first
+  end
+
   def self.email_template(auction)
-    "This is a template for: '#{auction['title']}''"
+    require 'erb'
+    require 'tilt'
+    template = Tilt::ERBTemplate.new('lib/templates/email_to_winner.erb')
+    delivery_deadline = format_time_to_est(auction['delivery_deadline'])
+    winning_bid = winning_bid_for_auction(auction)
+    ctx = {
+      auction: auction,
+      delivery_deadline: delivery_deadline,
+      winning_bid: winning_bid
+    }
+    template.render(nil, ctx)
   end
 end

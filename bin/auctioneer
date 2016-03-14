@@ -1,0 +1,18 @@
+#!/usr/bin/env ruby
+
+require 'auctioneer'
+require "docopt"
+doc = <<DOCOPT
+Auctioneer
+
+Usage:
+  #{__FILE__} email <auction_id>
+
+DOCOPT
+
+begin
+  command = Docopt::docopt(doc)
+  Auctioneer::Cli.route_command(command)
+rescue Docopt::Exit => e
+  puts e.message
+end

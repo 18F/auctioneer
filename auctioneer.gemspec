@@ -31,4 +31,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "pry"
   spec.add_dependency "curb"
   spec.add_dependency "table_print"
+  spec.add_dependency "docopt"
+  spec.add_dependency "tilt"
 end

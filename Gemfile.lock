@@ -3,8 +3,10 @@ PATH
   specs:
     auctioneer (0.1.0)
       curb
+      docopt
       pry
       table_print
+      tilt
 
 GEM
   remote: https://rubygems.org/
@@ -12,6 +14,7 @@ GEM
     coderay (1.1.1)
     curb (0.9.1)
     diff-lcs (1.2.5)
+    docopt (0.5.0)
     method_source (0.8.2)
     pry (0.10.3)
       coderay (~> 1.1.0)
@@ -33,6 +36,7 @@ GEM
     rspec-support (3.4.1)
     slop (3.6.0)
     table_print (1.5.4)
+    tilt (2.0.1)
 
 PLATFORMS
   ruby
