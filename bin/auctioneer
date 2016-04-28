@@ -7,6 +7,12 @@ Auctioneer
 
 Usage:
   #{__FILE__} email <auction_id>
+  #{__FILE__} count_auctions
+  #{__FILE__} bids_at_or_below <bid_amount>
+  #{__FILE__} unique_bidders
+  #{__FILE__} average_bid_amount
+  #{__FILE__} submit_cap <auction_id>
+  #{__FILE__} csv_of_emails
 
 DOCOPT
 

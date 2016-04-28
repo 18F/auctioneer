@@ -14,6 +14,56 @@ module Auctioneer
         auction = client.admin_auction_for_id(id)
         STDOUT.puts Auctioneer.email_template(auction)
       end
+
+      if command['count_auctions'] ==  true
+        client = Auctioneer::Client.new
+        auctions = client.admin_auctions['auctions']
+        STDOUT.puts auctions.length
+      end
+
+      if command['bids_at_or_below'] == true
+        client = Auctioneer::Client.new
+        bid_amount = command['<bid_amount>'].to_i
+        auctions = client.admin_auctions['auctions']
+        bids = auctions.map {|a| a['bids']}.flatten
+        filtered_bids = bids.select {|bid| bid['amount'] <= bid_amount}
+        STDOUT.puts filtered_bids.length
+      end
+
+      if command['unique_bidders'] == true
+        client = Auctioneer::Client.new
+        bid_amount = command['<bid_amount>'].to_i
+        auctions = client.admin_auctions['auctions']
+        bids = auctions.map {|a| a['bids']}.flatten
+        bidders = bids.map {|bid| bid['bidder_id']}.uniq
+        STDOUT.puts bidders.length
+      end
+
+      if command['average_bid_amount'] == true
+        client = Auctioneer::Client.new
+        bid_amount = command['<bid_amount>'].to_i
+        auctions = client.admin_auctions['auctions']
+        bids = auctions.map {|a| a['bids']}.flatten
+        amounts = bids.map {|b| b['amount']}
+        avg = amounts.inject(0.0) { |sum, el| sum + el } / amounts.size
+        STDOUT.puts avg
+      end
+
+      if command['submit_cap'] == true
+        client = Auctioneer::Client.new
+        id = command["<auction_id>"]
+        auction = client.admin_auction_for_id(id)
+
+        binding.pry
+      end
+
+      if command['csv_of_emails'] == true
+        client = Auctioneer::Client.new
+        users = client.admin_users['admin_report']
+        non_admin_users = users['non_admin_users']
+        emails = non_admin_users.map {|u| u['email']}.reject(&:nil?)
+        STDOUT.puts emails.join(",\n")
+      end
     end
   end
 
