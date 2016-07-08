@@ -66,7 +66,7 @@ module Auctioneer
   end
 
   module Protocol
-    BASE_URL = 'https://micropurchase.18f.gov'
+    BASE_URL = 'https://micropurchase.18f.gov/api/v0'
 
     def self.admin_auctions_path
       "#{BASE_URL}/admin/auctions"
