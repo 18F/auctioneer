@@ -3,6 +3,7 @@ require 'pry'
 require 'curb'
 require 'json'
 require 'table_print'
+require 'net/http'
 
 module Auctioneer
   class Bid
@@ -41,22 +42,63 @@ module Auctioneer
   end
 
   class Client
-    def initialize(api_key: ENV['MICROPURCHASE_API_KEY'])
-      #@client  = HTTPClient.new
+    def initialize(api_key: ENV['MICROPURCHASE_API_KEY'], base_url: nil)
+      @base_url = base_url
       @headers = {'Accept' => 'text/x-json'}
       @headers['Api-Key'] = api_key if api_key
+      @headers['Content-Type'] = 'application/json'
     end
 
     def admin_users
-      get(Auctioneer::Protocol.admin_users_path)
+      get(Auctioneer::Protocol.admin_users_path(base_url: @base_url))
     end
 
     def admin_auctions
-      get(Auctioneer::Protocol.admin_auctions_path)
+      get(Auctioneer::Protocol.admin_auctions_path(base_url: @base_url))
     end
 
-    def get(url)
-      #response = @client.get(path, nil, @headers)
+    def auctions(id = nil)
+      url = Auctioneer::Protocol.auctions_path(id, base_url: @base_url)
+      binding.pry
+      get(url)
+    end
+
+    def create_bid(amount: nil, auction_id: nil)
+      params = {
+        bid: {
+          amount: amount
+        }
+      }
+      post(Auctioneer::Protocol.auction_bids_path(auction_id, base_url: @base_url), params: params)
+    end
+
+    def post(url, params: nil)
+      # http = Curl.post(url, params) do |http|
+      #   http.headers = @headers
+      # end
+
+      # json_params = JSON.pretty_generate(params)
+      # http = Curl.post(url, json_params) do |http|
+      #   http.headers = @headers
+      # end
+      #
+      # JSON.parse(http.body_str)
+      uri = URI.parse(url)
+
+      # Convert the parameters into JSON and set the content type as application/json
+      req = Net::HTTP::Post.new(uri.path)
+      req.body = JSON.generate(params)
+      req["Content-Type"] = "application/json"
+      req['Api-Key'] = @headers['Api-Key']
+      req['Accept'] = @headers['Accept']
+
+      http = Net::HTTP.new(uri.host, uri.port)
+      response = http.start {|htt| htt.request(req)}
+
+      JSON.parse(response.body)
+    end
+
+    def get(url, params: nil)
       http = Curl.get(url) do |http|
         http.headers = @headers
       end
@@ -68,12 +110,24 @@ module Auctioneer
   module Protocol
     BASE_URL = 'https://micropurchase.18f.gov/api/v0'
 
-    def self.admin_auctions_path
-      "#{BASE_URL}/admin/auctions"
+    def self.admin_auctions_path(base_url: BASE_URL)
+      "#{base_url}/admin/auctions"
     end
 
-    def self.admin_users_path
-      "#{BASE_URL}/admin/users"
+    def self.admin_users_path(base_url: BASE_URL)
+      "#{base_url}/admin/users"
+    end
+
+    def self.auctions_path(id = nil, base_url: BASE_URL)
+      if id.nil?
+        "#{base_url}/auctions"
+      else
+        "#{base_url}/auctions/#{id}"
+      end
+    end
+
+    def self.auction_bids_path(id, base_url: BASE_URL)
+      "#{base_url}/auctions/#{id}/bids"
     end
   end
 end
@@ -123,5 +177,10 @@ def monitor_live_auctions
     sleep 10
   end
 end
+
+# copy and paste one of these:
+# client = Auctioneer::Client.new(base_url: 'http://localhost:3000')
+# client = Auctioneer::Client.new(base_url: 'https://micropurchase-staging.18f.gov')
+# client = Auctioneer::Client.new(base_url: 'https://micropurchase.18f.gov')
 
 binding.pry
